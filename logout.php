@@ -1,8 +1,7 @@
-<?php
-
-session_start();
-
-  echo "Logout Successfully ";
-  session_destroy();   // function that Destroys Session 
-  header("Location: index.php");
+<?php require_once('includes/config.php');
+//logout
+$user->logout(); 
+//logged in return to index page
+header('Location: index.php');
+exit;
 ?>
