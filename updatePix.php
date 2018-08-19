@@ -6,18 +6,21 @@ and open the template in the editor.
 -->
 <?php
 session_start();
-    
-$servername = "localhost";
-$username = "manox10h_admin";
-$password = "ENTERPWD";  // Need to put proper password in here tco
-$dbname = "manox10h_db";
+
+require_once('includes/config.php');
+
+// Moved to config file
+//$servername = "localhost";
+//$username = "manox10h_admin";
+//$password = "ENTERPWD";  // Need to put proper password in here tco
+//$dbname = "manox10h_db";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+//$conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-} 
+//if ($conn->connect_error) {
+//    die("Connection failed: " . $conn->connect_error);
+//} 
 
 //TODO: Update to only delete records for games that can be changed
 function deleteAllPicks($conn) {
@@ -70,6 +73,6 @@ function insertPick($conn, $gameNo, $pick) {
         }
         $conn->close();
         ?>
-        <a href="http://mano.x10host.com/admin/">Go back to main page</a>
+        <a href="http://mano.x10host.com/admin/selectEvent.php">Go back to main page</a>
     </body>
 </html>

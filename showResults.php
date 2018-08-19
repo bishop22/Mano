@@ -7,6 +7,8 @@
  */
 session_start();
 
+require_once('includes/config.php');
+
 // Get the parameters passed to the page
 if (!empty(filter_input(INPUT_GET, 'season', FILTER_SANITIZE_URL))) {
     $defSeasonID = filter_input(INPUT_GET, 'season', FILTER_SANITIZE_URL);
@@ -22,17 +24,18 @@ if (!empty(filter_input(INPUT_GET, 'eventID', FILTER_SANITIZE_URL))) {
     echo "ERROR: No event selected!";
 }
 
-$servername = "localhost";
-$username = "manox10h_admin";
-$password = "ENTERPWD";  //// Need to put proper password in here tco
-$dbname = "manox10h_db";
+// Moved to config file
+//$servername = "localhost";
+//$username = "manox10h_admin";
+//$password = "ENTERPWD";  //// Need to put proper password in here tco
+//$dbname = "manox10h_db";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+//$conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+//if ($conn->connect_error) {
+//    die("Connection failed: " . $conn->connect_error);
+//}
 
 // Query to get the distinct list of games for this event (week)
 $gStr = "SELECT DISTINCT eventGameID "
@@ -99,7 +102,7 @@ function getResult($conn, $curPlayerID, $curEventGameID) {
     </head>
     <body>
         This shows all picks for the current Week, with current status:<br>
-        <form name="currentPicks"  method="post" action="index.php">
+        <form name="currentPicks"  method="post" action="selectEvent.php">
 <!--            <table style="width:100%">  -->
             <table>
                 <caption>Here are the current picks and status...</caption>

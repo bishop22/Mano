@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+require_once('includes/config.php');
+
 // Get the parameters passed to the page
 if (!empty(filter_input(INPUT_GET, 'seasonID', FILTER_SANITIZE_URL))) {
     $defSeasonID = filter_input(INPUT_GET, 'seasonID', FILTER_SANITIZE_URL);
@@ -19,17 +21,18 @@ if (!empty(filter_input(INPUT_GET, 'sportID', FILTER_SANITIZE_URL))) {
     $_SESSION["sessionSportID"] = 2;
 }
 
-$servername = "localhost";
-$username = "manox10h_admin";
-$password = "ENTERPWD";  // Need to put proper password in here tco
-$dbname = "manox10h_db";
+// Moved to config file
+//$servername = "localhost";
+//$username = "manox10h_admin";
+//$password = "ENTERPWD";  // Need to put proper password in here tco
+//$dbname = "manox10h_db";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+//$conn = new mysqli($servername, $username, $password, $dbname);
 // Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+//if ($conn->connect_error) {
+//    die("Connection failed: " . $conn->connect_error);
+//}
 
 // Query to get the total damage to date
 $qStr = "SELECT P.playerDesc Player, SUM(IF(AP.winningClubAbbr='', 0, "
@@ -62,7 +65,7 @@ $qResult = $conn->query($qStr);
     </head>
     <body>
         This shows total Damage for Sport #<?php echo $_SESSION["sessionSportID"]?> and Season <?php echo $_SESSION["sessionSeason"]?>:<br>
-        <form name="currentPicks"  method="post" action="index.php">
+        <form name="currentPicks"  method="post" action="selectEvent.php">
 <!--            <table style="width:100%">  -->
             <table>
                 <caption></caption>

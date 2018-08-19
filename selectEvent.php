@@ -1,4 +1,9 @@
-<?php   session_start();  ?>
+<?php   
+
+session_start();
+
+require_once('includes/config.php');
+?>
 
 <!DOCTYPE html>
 <!--
@@ -19,9 +24,9 @@ and open the template in the editor.
             <br>
             <?php
             // put your code here
-            $defSportID = 2;
-            $defSeasonID = 2018;
-            $defWeekID = 2;
+            $defSportID = 1;    // 1 = Football; 2 = Madness
+            $defSeasonID = 2018;  // Set the season here
+            $defWeekID = -2;    // Set Week here (-2 for preseason week 3)
 
             // Check for variables in the URL to override defaults
             
@@ -30,7 +35,7 @@ and open the template in the editor.
             if (!empty(filter_input(INPUT_GET, 'sportID', FILTER_SANITIZE_URL))) {
                 $defSportID = filter_input(INPUT_GET, 'sportID', FILTER_SANITIZE_URL);
             } else {
-                $defSportID = 2;
+                $defSportID = 1;
             }
 
             if (!empty(filter_input(INPUT_GET, 'curSeason', FILTER_SANITIZE_URL))) {
@@ -42,21 +47,9 @@ and open the template in the editor.
             if (!empty(filter_input(INPUT_GET, 'curEvent', FILTER_SANITIZE_URL))) {
                 $defWeekID = filter_input(INPUT_GET, 'curEvent', FILTER_SANITIZE_URL);
             } else {
-                $defWeekID = 2;
+                $defWeekID = -2;
             }
                 
-            // Conect to the database and prepare to run any necessary functions
-            $servername = "localhost";
-            $username = "manox10h_admin";
-            $password = "ENTERPWD";  // Need to enter password here tco
-            $dbname = "manox10h_db";
-
-            // Create connection
-            $conn = new mysqli($servername, $username, $password, $dbname);
-            // Check connection
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            } 
             $qStr = "SELECT sportID, sportName FROM Sport ORDER BY sportID";
             $result = $conn->query($qStr);
 

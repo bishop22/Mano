@@ -3,7 +3,7 @@
 require_once('includes/config.php');
 
 //check if already logged in move to home page
-if( $user->is_logged_in() ){ header('Location: chooseWorkout.php'); exit(); }
+if( $user->is_logged_in() ){ header('Location: selectEvent.php'); exit(); }
 
 //process login form if submitted
 if(isset($_POST['submit'])){
@@ -17,7 +17,25 @@ if(isset($_POST['submit'])){
         $password = $_POST['password'];
         if ($user->login($conn, $username, $password)) {
             $_SESSION['username'] = $username;
-            header('Location: selectEvent.php');
+            
+            // Need to figure out the Player ID and Desc of the person that just logged in
+            $sql = "SELECT P.playerID, P.playerDesc "
+                    . "FROM Player P, Member M "
+                    . "WHERE P.memberID = M.memberID "
+                    . "AND M.username = '".$username."'";
+            $resultUser = $conn->query($sql);
+
+            // Make sure the logged in user is a Mano player - should have 1 record returned
+            if ($resultUser->num_rows == 1) {
+                $row = $resultUser->fetch_assoc();
+                $_SESSION["user"] = $row['playerDesc'];
+                $_SESSION["userID"] = $row['playerID'];
+                header('Location: selectEvent.php');
+                exit;
+            } else {
+                echo "Error: ";
+                $error[] = 'Logged in user is not a Mano player.';
+            }
             exit;
         } else {
             $error[] = 'Wrong username or password or your account has not been activated.';

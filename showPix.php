@@ -7,7 +7,10 @@ and open the template in the editor.
 
 <?php
     session_start();
-    // Get the parameters passed to the page
+
+require_once('includes/config.php');
+
+// Get the parameters passed to the page
     if (!empty(filter_input(INPUT_GET, 'season', FILTER_SANITIZE_URL))) {
         $defSeasonID = filter_input(INPUT_GET, 'season', FILTER_SANITIZE_URL);
         $_SESSION["sessionSeason"] = $defSeasonID;
@@ -24,17 +27,18 @@ and open the template in the editor.
 
 //   echo nl2br("The session season is set to ".$_SESSION["sessionSeason"]."\n");
     
-    $servername = "localhost";
-    $username = "manox10h_admin";
-    $password = "ENTERPWD";  //// Need to put proper password in here tco
-    $dbname = "manox10h_db";
+// Moved to config file
+//    $servername = "localhost";
+//    $username = "manox10h_admin";
+//    $password = "ENTERPWD";  //// Need to put proper password in here tco
+//    $dbname = "manox10h_db";
 
     // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
+//    $conn = new mysqli($servername, $username, $password, $dbname);
     // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    } 
+//    if ($conn->connect_error) {
+//        die("Connection failed: " . $conn->connect_error);
+//    } 
 
     // Build query string, and execute the query to get the event name
     $sql = "SELECT E.eventName "
