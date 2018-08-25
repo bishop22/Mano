@@ -24,23 +24,18 @@ if (!empty(filter_input(INPUT_GET, 'eventID', FILTER_SANITIZE_URL))) {
     echo "ERROR: No event selected!";
 }
 
-// Moved to config file
-//$servername = "localhost";
-//$username = "manox10h_admin";
-//$password = "ENTERPWD";  //// Need to put proper password in here tco
-//$dbname = "manox10h_db";
-
-// Create connection
-//$conn = new mysqli($servername, $username, $password, $dbname);
-// Check connection
-//if ($conn->connect_error) {
-//    die("Connection failed: " . $conn->connect_error);
-//}
+// Identify the current date and time, so we can display only games already underway or completed
+$curDate = date("Y-m-d");
+$curTime = date("H");
 
 // Query to get the distinct list of games for this event (week)
+// Updated to only include the games that are underway or completed
 $gStr = "SELECT DISTINCT eventGameID "
-        . "FROM EventGame EG JOIN Event E ON (EG.season = E.season AND EG.eventName = E.eventName) "
-        . "WHERE E.season = ".$_SESSION["sessionSeason"]." AND E.eventID = ".$_SESSION["sessionEventID"];
+        . "FROM EventGame EG "
+        . "JOIN Event E ON (EG.season = E.season AND EG.eventName = E.eventName) "
+        . "WHERE E.season = ".$_SESSION["sessionSeason"]." AND E.eventID = ".$_SESSION["sessionEventID"]
+        . " AND ((EG.gameDate < '".$curDate."') "
+        . "OR (EG.gameDate = '".$curDate."' AND EG.gameTimeHour <= ".$curTime."))";
 $gResult = $conn->query($gStr);
 
 // Query to get the distinct list of players for this event (week)
@@ -84,21 +79,16 @@ function getResult($conn, $curPlayerID, $curEventGameID) {
 // For each one, create a new row in the table
 // For each player, look for their pick for the current game and write to the table
     
+    //define page title
+    $title = 'Mano - View Summary';
+    //include header template
+    require('layout/header.php');   
 ?>
 
 <html>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Mano - View Summary</title>
-        <style>
-            table, th, td {
-                border: 1px solid black;
-            }
-            td {
-                text-align: center;
-            }            
-        </style>
     </head>
     <body>
         This shows all picks for the current Week, with current status:<br>

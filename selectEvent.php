@@ -101,12 +101,13 @@ and open the template in the editor.
                                 
             <?php
             // Now build the list of URLs for the possible Events/Weeks (based on selected season)
-
+            // Updated to order by date descending, so that newer stuff is on the top
             $qStr = "SELECT E.eventID, E.eventName, MIN(EG.gameDate) minDate, MAX(EG.gameDate) maxDate "
                     . "FROM Event E "
                     . "JOIN EventGame EG ON (EG.season = E.season AND EG.eventName = E.eventName) "
                     . "WHERE E.sportID = ".$defSportID." AND E.season = ".$defSeasonID." "
-                    . "GROUP BY E.eventID, E.eventName";
+                    . "GROUP BY E.eventID, E.eventName "
+                    . "ORDER BY MAX(EG.gameDate) DESC";
             $resultEvent = $conn->query($qStr);
                     
             $curDate = date("Y-m-d");

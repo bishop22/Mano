@@ -26,19 +26,7 @@ require_once('includes/config.php');
     }
 
 //   echo nl2br("The session season is set to ".$_SESSION["sessionSeason"]."\n");
-    
-// Moved to config file
-//    $servername = "localhost";
-//    $username = "manox10h_admin";
-//    $password = "ENTERPWD";  //// Need to put proper password in here tco
-//    $dbname = "manox10h_db";
 
-    // Create connection
-//    $conn = new mysqli($servername, $username, $password, $dbname);
-    // Check connection
-//    if ($conn->connect_error) {
-//        die("Connection failed: " . $conn->connect_error);
-//    } 
 
     // Build query string, and execute the query to get the event name
     $sql = "SELECT E.eventName "
@@ -46,99 +34,105 @@ require_once('includes/config.php');
             . "WHERE E.eventID = ".$defEventID." AND E.season = ".$defSeasonID;
     $resultEvent = $conn->query($sql);
 
+    // Identify the current date and time, so we can prevent the display of games already underway or completed
+    $curDate = date("Y-m-d");
+    $curTime = date("H");
+
     // Build query string, and execute the query
+    // Updated to only get the games that have not hit the hour they start
     $sql = "SELECT EG.favoriteClubAbbr, EG.dogClubAbbr, EG.spread, EG.sequence, P.selectedClubAbbr "
-            . "FROM EventGame EG JOIN Event E LEFT JOIN Pick P ON (P.eventGameID = EG.eventGameID AND P.PlayerID = ".$_SESSION["userID"].") "
-            . "WHERE EG.eventName = E.eventName AND EG.season = E.season "
-            . "AND E.eventID = ".$defEventID." AND E.season = ".$defSeasonID 
+            . "FROM EventGame EG "
+            . "JOIN Event E ON EG.eventName = E.eventName AND EG.season = E.season "
+            . "LEFT JOIN Pick P ON (P.eventGameID = EG.eventGameID AND P.PlayerID = ".$_SESSION["userID"].") "
+            . "WHERE E.eventID = ".$defEventID." AND E.season = ".$defSeasonID 
+            . " AND ((EG.gameDate > '".$curDate."') "
+            . " OR (EG.gameDate = '".$curDate."' AND EG.gameTimeHour > ".$curTime."))"
             . " ORDER BY EG.sequence";
     $result = $conn->query($sql);
 //    echo nl2br("Query string was: ".$sql."\n")
+    
+    //define page title
+    $title = 'Mano Pick Selection';
+    //include header template
+    require('layout/header.php');
 ?>
 
 <html>
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Mano - Make Picks</title>
-        <style>
-            table, th, td {
-                border: 1px solid black;
-            }
-            td {
-                text-align: center;
-            }      
-        </style>
     </head>
     <body>
         This shows the games for the current Week:<br>
         <form name="currentGames"  method="post" action="updatePix.php">
 <!--            <table style="width:100%">  -->
-            <table>
-                <caption>Choose your picks below...</caption>
-                <thead>
-                    <tr>
-                        <th>Select</th>
-                        <th>Favorite</th>
-                        <th>Dog</th>
-                        <th>Spread</th>
-                        <th>Select</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div style="overflow-x:auto;">
+                <table>
+                    <caption>Choose your picks below...</caption>
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Favorite</th>
+                            <th>Dog</th>
+                            <th>Spread</th>
+                            <th>Select</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                    <?php
-                    // If data was returned, display each row, along with radio buttons to pick each game
-                    if ($result->num_rows > 0) {
-                        // output data of each row
-                        $i = 0;
-                        while($row = $result->fetch_assoc()) {
-                    ?>
-                            <tr>
-                                <td>
-                                    <?php 
-                                    if ($row["selectedClubAbbr"] == $row["favoriteClubAbbr"]) {
-                                        $dbValue = 1;
-                                    } else if ($row["selectedClubAbbr"] == $row["dogClubAbbr"]) {
-                                        $dbValue = 2;
-                                    } else {
-                                        $dbValue = 0;
-                                    }
-                                    if ($row["dogClubAbbr"] == "") {
-                                        echo "";
-                                    } else {
-                                        echo "<input type='radio' name='tech[".$row["sequence"]."]' value='1' "
-                                                .($dbValue==1?' checked=checked':'').">";
-                                    } ?>
-                                </td>
-                                <td>
-                                    <?php echo $row["favoriteClubAbbr"]; ?>
-                                </td>
-                                <td>
-                                    <?php echo $row["dogClubAbbr"]; ?>
-                                </td>
-                                <td>
-                                    <?php echo $row["spread"]; ?>
-                                </td>
-                                <td>
-                                    <?php 
-                                    if ($row["dogClubAbbr"] == "") {
-                                        echo "";
-                                    } else {
-                                        echo "<input type='radio' name='tech[".$row["sequence"]."]' value='2' "
-                                                .($dbValue==2?' checked=checked':'').">";
-                                    } ?>
-                                </td>
-                            </tr>
-                    <?php
+                        <?php
+                        // If data was returned, display each row, along with radio buttons to pick each game
+                        if ($result->num_rows > 0) {
+                            // output data of each row
+                            $i = 0;
+                            while($row = $result->fetch_assoc()) {
+                        ?>
+                                <tr>
+                                    <td>
+                                        <?php 
+                                        if ($row["selectedClubAbbr"] == $row["favoriteClubAbbr"]) {
+                                            $dbValue = 1;
+                                        } else if ($row["selectedClubAbbr"] == $row["dogClubAbbr"]) {
+                                            $dbValue = 2;
+                                        } else {
+                                            $dbValue = 0;
+                                        }
+                                        if ($row["dogClubAbbr"] == "") {
+                                            echo "";
+                                        } else {
+                                            echo "<input type='radio' name='tech[".$row["sequence"]."]' value='1' "
+                                                    .($dbValue==1?' checked=checked':'').">";
+                                        } ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $row["favoriteClubAbbr"]; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $row["dogClubAbbr"]; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $row["spread"]; ?>
+                                    </td>
+                                    <td>
+                                        <?php 
+                                        if ($row["dogClubAbbr"] == "") {
+                                            echo "";
+                                        } else {
+                                            echo "<input type='radio' name='tech[".$row["sequence"]."]' value='2' "
+                                                    .($dbValue==2?' checked=checked':'').">";
+                                        } ?>
+                                    </td>
+                                </tr>
+                        <?php
+                            }
+                        } else {
+                            echo "0 results";
                         }
-                    } else {
-                        echo "0 results";
-                    }
-                    $conn->close();
-                    ?>
-                </tbody>
-            </table>
+                        $conn->close();
+                        ?>
+                    </tbody>
+                </table>
+            </div>
             <input type="submit" name="submit" value="Save Picks">
         </form>
     </body>

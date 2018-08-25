@@ -9,26 +9,24 @@ session_start();
 
 require_once('includes/config.php');
 
-// Moved to config file
-//$servername = "localhost";
-//$username = "manox10h_admin";
-//$password = "ENTERPWD";  // Need to put proper password in here tco
-//$dbname = "manox10h_db";
+// Identify the current date and time, so we only save picks for games not underway or completed
+$curDate = date("Y-m-d");
+$curTime = date("H");
 
-// Create connection
-//$conn = new mysqli($servername, $username, $password, $dbname);
-// Check connection
-//if ($conn->connect_error) {
-//    die("Connection failed: " . $conn->connect_error);
-//} 
-
-//TODO: Update to only delete records for games that can be changed
-function deleteAllPicks($conn) {
+// Updated to only delete records for games that can be changed (not underway or completed)
+function deleteAllPicks($conn, $curDate, $curTime) {
 //    echo nl2br("Deleting picks, season is ".$_SESSION["sessionSeason"].", event is ".$_SESSION["sessionEventID"]."\n");
     $dStr = "DELETE FROM Pick "
             . "WHERE PlayerID = ".$_SESSION["userID"]
-            ." AND EventGameID IN (SELECT EventGameID FROM EventGame EG, Event E WHERE EG.Season = E.Season AND EG.EventName = E.EventName "
-            . "AND E.Season = ".$_SESSION["sessionSeason"]." AND E.EventID = ".$_SESSION["sessionEventID"].")"; 
+            ." AND EventGameID IN "
+            . "("
+            . "SELECT EventGameID "
+            . "FROM EventGame EG, Event E "
+            . "WHERE EG.Season = E.Season AND EG.EventName = E.EventName "
+            . "AND E.Season = ".$_SESSION["sessionSeason"]." AND E.EventID = ".$_SESSION["sessionEventID"]." "
+            . "AND ((EG.gameDate > '".$curDate."') "
+            . "OR (EG.gameDate = '".$curDate."' AND EG.gameTimeHour > ".$curTime."))"
+            . ")"; 
 //    echo nl2br("Executing: ".$dStr."\n");
     $resultDelete = $conn->query($dStr);
 //    echo nl2br("result:".$resultDelete."\n");
@@ -36,7 +34,11 @@ function deleteAllPicks($conn) {
 
 //TODO: Update to allow insert to fail for duplicate key (because previous record not deleted - too late)
 function insertPick($conn, $gameNo, $pick) {
-    $qStr = "SELECT EG.EventGameID, EG.FavoriteClubAbbr, EG.DogClubAbbr FROM EventGame EG, Event E WHERE EG.Season = E.Season AND EG.EventName = E.EventName AND E.Season = ".$_SESSION["sessionSeason"]." AND E.EventID = ".$_SESSION["sessionEventID"]." AND Sequence = ".$gameNo;
+    $qStr = "SELECT EG.EventGameID, EG.FavoriteClubAbbr, EG.DogClubAbbr "
+            . "FROM EventGame EG, Event E "
+            . "WHERE EG.Season = E.Season AND EG.EventName = E.EventName "
+            . "AND E.Season = ".$_SESSION["sessionSeason"]." "
+            . "AND E.EventID = ".$_SESSION["sessionEventID"]." AND Sequence = ".$gameNo;
     $resultSel = $conn->query($qStr);
     if ($resultSel->num_rows == 1) {
         while($row = $resultSel->fetch_assoc()) {
@@ -48,12 +50,13 @@ function insertPick($conn, $gameNo, $pick) {
             }
         }
     } else { echo nl2br("ERROR: found zero or multiple rows for the current game\n"."string: ".$qStr."\n"); }      
-    $iStr = "INSERT INTO Pick (PlayerID, EventGameID, SelectedClubAbbr) VALUES (".$_SESSION["userID"].", ".$curGameID.", '".$curPickAbbr."')";
+    $iStr = "INSERT INTO Pick (PlayerID, EventGameID, SelectedClubAbbr) "
+            ."VALUES (".$_SESSION["userID"].", ".$curGameID.", '".$curPickAbbr."')";
     $resultIns = $conn->query($iStr);
     if ($resultIns == 1) {
         echo nl2br("You chose ".$curPickAbbr." for game # ".$curGameID."\n");
     } else {
-        echo nl2br("ERROR: Database insert seems to have failed for game #".$curGameID."\n");
+        echo nl2br("ERROR: Database insert seems to have failed for game #".$curGameID." (too late?)\n");
     }
 }
 
@@ -67,7 +70,7 @@ function insertPick($conn, $gameNo, $pick) {
     <body>
         <?php
         $tech2 = $_POST['tech'];
-        deleteAllPicks($conn);
+        deleteAllPicks($conn, $curDate, $curTime);
         foreach( $tech2 as $key => $n ) {
             insertPick($conn, $key, $n);
         }

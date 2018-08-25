@@ -16,3 +16,33 @@ a {
 	color: #EF1F2F;
 	text-decoration: none;
 }
+
+
+table, th, td {
+    border: 1px solid black;
+}
+
+/*
+table {
+    border-collapse: collapse;
+}
+*/
+
+/* 
+** The following style elements are intended to make the tables prettier
+*/
+
+td {
+    text-align: center;
+}
+tr {
+    padding: 10px;
+}
+tr:nth-child(even) {
+    background-color: #98fb98;
+}
+th {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+}
