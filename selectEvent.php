@@ -3,6 +3,12 @@
 session_start();
 
 require_once('includes/config.php');
+
+//define page title
+$title = 'Choose Sport,Season and Week/Event';
+//include header template
+require_once('layout/header.php');  
+
 ?>
 
 <!DOCTYPE html>
@@ -16,7 +22,6 @@ and open the template in the editor.
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Choose Sport,Season and Week/Event</title>
     </head>
     <body>
         <form>
@@ -26,10 +31,9 @@ and open the template in the editor.
             // put your code here
             $defSportID = 1;    // 1 = Football; 2 = Madness
             $defSeasonID = 2018;  // Set the season here
-            $defWeekID = -2;    // Set Week here (-2 for preseason week 3)
+            $defWeekID = -1;    // Set Week here (-1 for preseason week 4)
 
             // Check for variables in the URL to override defaults
-            
             echo nl2br("You are logged in as: ".$_SESSION['user']."\n\n");
 
             if (!empty(filter_input(INPUT_GET, 'sportID', FILTER_SANITIZE_URL))) {
@@ -55,19 +59,19 @@ and open the template in the editor.
 
             if ($result->num_rows > 0) {
             ?>
-            Select desired sport:
+
+            Select Sport:<br>
+            <div class="custom-select" style="width:200px;">
                 <select name="sportID" id="sportID">
-                <?php
-                while($row = $result->fetch_assoc()) {
-                ?>
-
-                    <option <?=($row['sportID']==$defSportID)?'selected="selected"':''?> value="<?php echo $row['sportID'] ?>"><?php echo $row['sportName'] ?></option>
-
-
-                <?php
-                }
-                ?>
+                    <?php
+                    while($row = $result->fetch_assoc()) {
+                    ?>
+                        <option <?=($row['sportID']==$defSportID)?'selected="selected"':''?> value="<?php echo $row['sportID'] ?>"><?php echo $row['sportName'] ?></option>
+                    <?php
+                    }
+                    ?>
                 </select><br>
+            </div>
             <?php
             } else {
                 echo "Error: no sports were found";
@@ -79,16 +83,18 @@ and open the template in the editor.
 
             if ($resultSeason->num_rows > 0) {
             ?>
-                Select desired season:
-                <select name="curSeason" id="curSeason">
-                <?php
-                while($row = $resultSeason->fetch_assoc()) {
-                ?>
-                    <option <?=($row['season']==$defSeasonID)?'selected="selected"':''?> value="<?php echo $row['season'] ?>"><?php echo $row['season'] ?></option>
-                <?php
-                }
-                ?>
-                </select><br><br>
+            Select Season:<br>
+                <div class="custom-select" style="width:200px;">
+                    <select name="curSeason" id="curSeason">
+                        <?php
+                        while($row = $resultSeason->fetch_assoc()) {
+                        ?>
+                            <option <?=($row['season']==$defSeasonID)?'selected="selected"':''?> value="<?php echo $row['season'] ?>"><?php echo $row['season'] ?></option>
+                        <?php
+                        }
+                        ?>
+                    </select><br><br>
+                </div>
             <?php
             } else {
                 echo nl2br("\nError: no seasons were found");

@@ -3,6 +3,11 @@ session_start();
 
 require_once('includes/config.php');
 
+//define page title
+$title = 'Mano - Damage';
+//include header template
+require_once('layout/header.php');  
+
 // Get the parameters passed to the page
 if (!empty(filter_input(INPUT_GET, 'seasonID', FILTER_SANITIZE_URL))) {
     $defSeasonID = filter_input(INPUT_GET, 'seasonID', FILTER_SANITIZE_URL);
@@ -20,19 +25,6 @@ if (!empty(filter_input(INPUT_GET, 'sportID', FILTER_SANITIZE_URL))) {
     echo "ERROR: No sport ID identified (using default = 2)!";
     $_SESSION["sessionSportID"] = 2;
 }
-
-// Moved to config file
-//$servername = "localhost";
-//$username = "manox10h_admin";
-//$password = "ENTERPWD";  // Need to put proper password in here tco
-//$dbname = "manox10h_db";
-
-// Create connection
-//$conn = new mysqli($servername, $username, $password, $dbname);
-// Check connection
-//if ($conn->connect_error) {
-//    die("Connection failed: " . $conn->connect_error);
-//}
 
 // Query to get the total damage to date
 $qStr = "SELECT P.playerDesc Player, SUM(IF(AP.winningClubAbbr='', 0, "
@@ -53,15 +45,6 @@ $qResult = $conn->query($qStr);
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Mano - Damage</title>
-        <style>
-            table, th, td {
-                border: 1px solid black;
-            }
-            td {
-                text-align: center;
-            }            
-        </style>
     </head>
     <body>
         This shows total Damage for Sport #<?php echo $_SESSION["sessionSportID"]?> and Season <?php echo $_SESSION["sessionSeason"]?>:<br>
