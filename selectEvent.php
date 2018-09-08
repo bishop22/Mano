@@ -123,13 +123,13 @@ and open the template in the editor.
                 Click on desired Event/Week from this list:<br>
                 <?php
                 while($row = $resultEvent->fetch_assoc()) {
-                    if (($curDate < $row['maxDate']) || (($curDate == $row['maxDate']) && ($curTime < "12:00"))) {
+                    if (($curDate < $row['maxDate']) || (($curDate == $row['maxDate']) && ($curTime < "19:00"))) {
                         ?>
                         <a href="http://mano.x10host.com/admin/showPix.php?eventID=<?php echo $row['eventID']?>&season=<?php echo $defSeasonID?>"><?php echo nl2br($row['eventName']."\n"); ?></a>
                     
                     <?php    
                     } 
-                    if (($curDate > $row['minDate']) || (($curDate == $row['minDate']) && ($curTime >= "12:00"))) {
+                    if (($curDate > $row['minDate']) || (($curDate == $row['minDate']) && ($curTime >= "20:00"))) {
                         ?>
                         <a href="http://mano.x10host.com/admin/showAllPix.php?eventID=<?php echo $row['eventID']?>&season=<?php echo $defSeasonID?>"><?php echo nl2br("Show picks - ".$row['eventName']."\n"); ?></a>
                         <a href="http://mano.x10host.com/admin/showResults.php?eventID=<?php echo $row['eventID']?>&season=<?php echo $defSeasonID?>"><?php echo nl2br("Show pick status - ".$row['eventName']."\n"); ?></a>

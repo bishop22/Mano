@@ -35,7 +35,8 @@ class User extends Password {
                 $_SESSION['memberID'] = $row['memberID'];
                 return true;
             } else {
-                return 'bad password: '.$password.' vs. '.$row['password'];
+//                return 'bad password: '.$password.' vs. '.$row['password'];
+                return false;
             }
 	}
         
